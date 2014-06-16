@@ -1,9 +1,10 @@
-function [best_hyperparameters, best_nlZ] = ...
-      minimize_minFunc(initial_hyperparameters, model, x, y, varargin)
+function [best_hyperparameters, best_nlZ] = minimize_minFunc(model, ...
+          x, y, varargin)
 
   % parse optional inputs
   parser = inputParser;
 
+  addParamValue(parser, 'initial_hyperparameters', []);
   addParamValue(parser, 'num_restarts', 1);
   addParamValue(parser, 'minFunc_options', ...
                         struct('Display',     'off', ...
@@ -12,8 +13,10 @@ function [best_hyperparameters, best_nlZ] = ...
   parse(parser, varargin{:});
   options = parser.Results;
 
-  if (isempty(initial_hyperparameters))
+  if (isempty(options.initial_hyperparameters))
     initial_hyperparameters = model.prior();
+  else
+    initial_hyperparameters = options.initial_hyperparameters;
   end
 
   f = @(hyperparameter_values) gp_optimizer_wrapper(hyperparameter_values, ...
