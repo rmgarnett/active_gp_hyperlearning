@@ -54,6 +54,8 @@
 % Usage
 % -----
 %
+%   results = learn_gp_hyperparameters(problem, model, varargin)
+%
 % Required inputs:
 %
 %   problem: a struct describing the active learning problem,
@@ -92,6 +94,31 @@
 %
 %      'num_restarts': the number of random restarts to use when
 %                      optimizing the log posterior, default: 1
+%
+% Outputs:
+%
+%   results: a struct describing the active learning process,
+%            containing fields:
+%
+%                .chosen_x: the chosen observation locations
+%                           (problem.num_evalutations x D)
+%                .chosen_y: the associated observation values
+%                           (problem.num_evalutations x 1)
+%     .map_hyperparameters: an array of GPML hyperparameter structs
+%                           containing the MAP hyperparameters
+%                           learned after every evaluation
+%          .map_posteriors: an array of GPML posterior structs
+%                           corresponding to
+%
+%                             (D_i, \hat{\theta}_i),
+%
+%                            where D_i is the first i observations,
+%
+%                             D_i = {(x_k, y_k)} (k = 1..i),
+%
+%                           and \hat{\theta}_i is the MAP
+%                           hyperparameters learned from D_i
+%                           (contained in results.map_hyperparameters)
 %
 % See also GP, MGP, MINFUNC.
 

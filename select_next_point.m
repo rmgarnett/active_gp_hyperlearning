@@ -13,6 +13,8 @@
 % Usage
 % -----
 %
+%   ind = select_next_point(map_hyperparameters, model, x, y, x_star)
+%
 % Inputs:
 %
 %   map_hyperparameters: a GPML hyperparameter struct containing
@@ -25,12 +27,10 @@
 %     covariance_function: a GPML covariance function
 %              likelihood: a GPML likelihood
 %
-%                     x: a matrix containing the observation
-%                        locations (N x D)
-%                     y: a vector containing the observation values
+%                     x: the observation locations (N x D)
+%                     y: the corresponding observation values
 %                        (N x 1)
-%                x_star: a matrix containing the candidate
-%                        observation locations (N* x D)
+%                x_star: the candidate observation locations (N_* x D)
 %
 % Outputs:
 %
