@@ -11,9 +11,9 @@ Given a GP model on a function *f*:
 
 ![p(f | \theta) = GP(f; mu(x; \theta), K(x, x'; \theta))][1]
 
-this routine sequentially chooses a sequence of locations *X =
-{x<sub>i</sub>}* to make observations with the goal of learning the GP
-hyperparameters *&theta;* as quickly as possible. This is done by
+this routine sequentially chooses a sequence of locations *X* =
+{*x*<sub>*i*</sub>} to make observations with the goal of learning the
+GP hyperparameters *&theta;* as quickly as possible. This is done by
 maintaining a probabilistic belief *p*(*&theta;* | *D*) and selecting
 each observation location by maximizing the Bayesian active learning
 by disagreement (BALD) criterion described in
