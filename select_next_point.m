@@ -1,3 +1,46 @@
+% SELECT_NEXT_POINT selects next point for GP hyperparameter learning.
+%
+% This function determines which point in a given set of candidates
+% is the most informative for learning GP hyperparameter
+% learning. We do this by maximizing the Bayesian active learning
+% by disagreement (BALD) objective:
+%
+%   H[f | x, D] - E_\theta[f | x , D, \theta]
+%
+% We use the marginal GP approximation (MGP) to approximate this
+% objective.
+%
+% Usage
+% -----
+%
+% Inputs:
+%
+%   map_hyperparameters: a GPML hyperparameter struct containing
+%                        the MAP hyperparameters given (X, y)
+%                 model: a struct describing the GP model,
+%                        containing fields:
+%
+%        inference_method: a GPML inference method
+%           mean_function: a GPML mean function
+%     covariance_function: a GPML covariance function
+%              likelihood: a GPML likelihood
+%
+%                     x: a matrix containing the observation
+%                        locations (N x D)
+%                     y: a vector containing the observation values
+%                        (N x 1)
+%                x_star: a matrix containing the candidate
+%                        observation locations (N* x D)
+%
+% Outputs:
+%
+%   ind: an index into x_star identifying the observation location
+%        to select next
+%
+% See also LEARN_GP_HYPERPARAMETERS.
+
+% Copyright (c) 2014 Roman Garnett.
+
 function ind = select_next_point(map_hyperparameters, model, x, y, x_star)
 
   [~, ~, ~, f_star_variance_mgp, ...
