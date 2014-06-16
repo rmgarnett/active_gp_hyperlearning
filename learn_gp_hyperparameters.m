@@ -1,3 +1,102 @@
+% LEARN_GP_HYPERPARAMETERS actively learn GP hyperparameters.
+%
+% This is an implementation of the method for actively learning GP
+% hyperparameters described in
+%
+%   Garnett, R., Osborne, M., and Hennig, P. Active Learning of Linear
+%   Embeddings for Gaussian Processes. (2014). 30th Conference on
+%   Uncertainty in Artificial Intelligence (UAI 2014).
+%
+% Given a GP model on a function f:
+%
+%   p(f | \theta) = GP(f; mu(x; \theta), K(x, x'; \theta)),
+%
+% this routine sequentially chooses a sequence of locations X = {x_i}
+% to make observations with the goal of learning the GP
+% hyperparameters \theta as quickly as possible. This is done by
+% maintaining a probabilistic belief p(\theta | D) and selecting
+% each observation location by maximizing the Bayesian active
+% learning by disagreement (BALD) criterion described in
+%
+%   N. Houlsby, F. Huszar, Z. Ghahramani, and M. Lengyel. Bayesian
+%   Active Learning for Classification and Preference
+%   Learning. (2011). arXiv preprint arXiv:1112.5745 [stat.ML].
+%
+% This implementation uses the approximation to BALD described in the
+% Garnett, et al. paper above, which relies on the "marginal GP" (MGP)
+% method for approximate GP hyperparameter marginalization.
+%
+% See demo/demo.m for a simple example usage.
+%
+% Dependencies
+% ------------
+%
+% This code is written to be interoperable with the GPML MATLAB
+% toolbox, available here:
+%
+%   http://www.gaussianprocess.org/gpml/code/matlab/doc/
+%
+% The GPML toolbox must be in your MATLAB path for this function to
+% work. This function also depends on the gpml_extensions repository,
+% available here:
+%
+%   https://github.com/rmgarnett/gpml_extensions/
+%
+% as well as the marginal GP (MGP) implementation available here:
+%
+%   https://github.com/rmgarnett/mgp/
+%
+% Both must be in your MATLAB path. Finally, the optimization of
+% the GP log posterior requires Mark Schmidt's minFunc function:
+%
+%   http://www.di.ens.fr/~mschmidt/Software/minFunc.html
+%
+% Usage
+% -----
+%
+% Required inputs:
+%
+%   problem: a struct describing the active learning problem,
+%            containing fields:
+%
+%      num_evaluations: the number of observations to select
+%     candidate_x_star: the set of observation locations available
+%                       for selection
+%                    f: a function handle that returns the function
+%                       observation at a given point, which will be
+%                       called as
+%
+%                         y_star = problem.f(x_star)
+%
+%     model: a struct describing the GP model, containing fields:
+%
+%          inference_method: a GPML inference method
+%                            (optional, default: @exact_inference)
+%             mean_function: a GPML mean function
+%                            (optional, default: @zero_mean)
+%       covariance_function: a GPML covariance function
+%                likelihood: a GPML likelihood
+%                            (optional, default: @likGauss)
+%                     prior: a function handle to a hyperparameter
+%                            prior p(\theta) (see priors.m in
+%                            gpml_extensions)
+%
+% Optional inputs (specified as name/value pairs):
+%
+%   'minFunc_options': a struct containing options to pass to
+%                      minFunc when optimizing the log posterior,
+%                      default:
+%
+%                        .Display     = 'off'
+%                        .MaxFunEvals = 300
+%
+%      'num_restarts': the number of random restarts to use when
+%                      optimizing the log posterior, default: 1
+%
+% See also GP, MGP, MINFUNC.
+
+% Copyright (c) 2014, Roman Garnett.
+
 function results = learn_gp_hyperparameters(problem, model, varargin)
 
   % parse optional inputs
