@@ -95,7 +95,7 @@
 %
 % See also GP, MGP, MINFUNC.
 
-% Copyright (c) 2014, Roman Garnett.
+% Copyright (c) 2014 Roman Garnett.
 
 function results = learn_gp_hyperparameters(problem, model, varargin)
 
@@ -123,6 +123,12 @@ function results = learn_gp_hyperparameters(problem, model, varargin)
     model.likelihood = @likGauss;
   end
 
+  % add prior to inference method if not already incorporated
+  if (~isempty(strfind(func2str(model.inference_method), 'inference_with_prior')))
+    model.inference_method = ...
+        add_prior_to_inference_method(model.inference_method, model.prior);
+  end
+
   % choose first point closest to mean of available points
   residuals = bsxfun(@minus, problem.candidate_x_star, ...
                              mean(problem.candidate_x_star));
@@ -146,6 +152,7 @@ function results = learn_gp_hyperparameters(problem, model, varargin)
       initial_hyperparameters = [];
     end
 
+    % find MAP hyperparameters
     results.map_hyperparameters(i) = ...
         minimize_minFunc(initial_hyperparameters, model, x, y, ...
                          'num_restarts',    options.num_restarts, ...
