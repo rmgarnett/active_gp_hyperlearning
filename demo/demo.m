@@ -52,9 +52,12 @@ y_star = mvnrnd(mu, K)';
 y_star = y_star + exp(true_hyperparameters.lik) * randn(size(y_star));
 
 % setup problem struct
-problem.num_evaluations  = 20;
+problem.num_evaluations  = 15;
 problem.candidate_x_star = x_star;
-problem.f = @(x) (y_star(find(all(bsxfun(@eq, x, x_star), 2))));
+
+% function is a simple lookup table
+problem.f                = ...
+    @(x) (y_star(find(all(bsxfun(@eq, x, x_star), 2))));
 
 % actively learn GP hyperparameters
 results = learn_gp_hyperparameters(problem, model);
@@ -83,7 +86,7 @@ ind = randperm(num_points, problem.num_evaluations);
 x = x_star(ind, :);
 y = y_star(ind);
 
-map_hyperparameters_random = minimize_minFunc([], model, x, y);
+map_hyperparameters_random = minimize_minFunc(model, x, y);
 
 [~, ~, f_star_mean, f_star_variance, log_probabilities] = ...
     gp(map_hyperparameters_random, model.inference_method, ...
