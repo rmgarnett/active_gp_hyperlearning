@@ -48,6 +48,8 @@ x_star = linspace(-5, 5, num_points)';
 mu = feval(model.mean_function{:},       true_hyperparameters.mean, x_star);
 K  = feval(model.covariance_function{:}, true_hyperparameters.cov,  x_star);
 
+K = (K + K') / 2;
+
 y_star = mvnrnd(mu, K)';
 y_star = y_star + exp(true_hyperparameters.lik) * randn(size(y_star));
 
